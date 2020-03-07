@@ -1,0 +1,34 @@
+name: Build
+
+# build timings
+on: push
+
+jobs:
+  build:
+
+    # Image
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    # Build
+    - name: Linux Build
+      run: |
+        sudo apt-get install -y libsdl2-dev
+        cargo build --verbose
+
+    - name: Windows Build
+      run: |
+        sudo apt-get install -y gcc gcc-mingw-w64
+        $HOME/.cargo/bin/rustup target add x86_64-pc-windows-gnu
+        curl -OL https://www.libsdl.org/release/SDL2-devel-2.0.10-mingw.tar.gz
+        tar zxvf SDL2-devel-2.0.10-mingw.tar.gz
+        cp -r SDL2-2.0.10/x86_64-w64-mingw32/lib/* ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-pc-windows-gnu/lib/
+        cargo build --verbose --target x86_64-pc-windows-gnu
+
+    # Test
+    - name: Run tests
+      run: cargo test --verbose
