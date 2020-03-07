@@ -1,7 +1,11 @@
 name: Build
 
 # build timings
-on: push
+on:
+  push:
+    branches:
+  schedule:
+    - cron:  '0 9 * * *'
 
 jobs:
   build:
