@@ -1,0 +1,54 @@
+name: Build
+
+# build timings
+on:
+  push:
+    branches:
+  schedule:
+    - cron:  '0 9 * * *'
+
+jobs:
+  build:
+
+    # Image
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    # Build
+    - name: Build - Linux
+      run: |
+        sudo apt-get install -y libsdl2-dev
+        cargo build --verbose
+
+    - name: Build - Windows
+      run: |
+        sudo apt-get install -y gcc gcc-mingw-w64
+        $HOME/.cargo/bin/rustup target add x86_64-pc-windows-gnu
+        curl -OL https://www.libsdl.org/release/SDL2-devel-2.0.10-mingw.tar.gz
+        tar zxvf SDL2-devel-2.0.10-mingw.tar.gz
+        cp -r SDL2-2.0.10/x86_64-w64-mingw32/lib/* ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-pc-windows-gnu/lib/
+        cargo build --verbose --target x86_64-pc-windows-gnu
+
+    # Test
+    - name: Run tests - Linux
+      run: cargo test --verbose
+
+    # Packaging
+    - name: Packaging - Windows
+      run: | 
+        sudo apt-get install -y zip unzip
+        mkdir -p archive
+        cp ./target/x86_64-pc-windows-gnu/debug/conkei.exe ./archive
+        curl -OL https://www.libsdl.org/release/SDL2-2.0.10-win32-x64.zip
+        unzip SDL2-2.0.10-win32-x64.zip
+        cp ./SDL2.dll ./archive
+
+    - name: Upload archive
+      uses: actions/upload-artifact@v1
+      with:
+        name: archive_windows_x64
+        path: archive
