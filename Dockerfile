@@ -13,11 +13,14 @@ RUN $HOME/.cargo/bin/rustup target add x86_64-pc-windows-gnu
 
 # sdl2
 ## ubuntu
-RUN apt-get install -y libsdl2-dev
-WORKDIR /tmp
+RUN apt-get install -y libsdl2-dev libsdl2-image-dev
 ## windows
+WORKDIR /tmp
 RUN curl -OL https://www.libsdl.org/release/SDL2-devel-2.0.10-mingw.tar.gz && \
     tar zxvf SDL2-devel-2.0.10-mingw.tar.gz && \
     cp -r SDL2-2.0.10/x86_64-w64-mingw32/lib/* ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-pc-windows-gnu/lib/
+RUN curl -OL https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.5-mingw.tar.gz && \
+    tar zxvf SDL2_image-devel-2.0.5-mingw.tar.gz && \
+    cp -r SDL2_image-2.0.5/x86_64-w64-mingw32/lib/* ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-pc-windows-gnu/lib/
 
 WORKDIR /root/src
